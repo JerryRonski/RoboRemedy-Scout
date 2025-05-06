@@ -1,0 +1,13 @@
+{
+    "test": {
+        "AutoScore": { "type": "number", "label": "Auto Score" },
+        "TeleopScore": { "type": "number", "label": "Teleop Score" },
+        "EndScore": { "type": "range", "label": "Endgame Score" },
+        "isParked": { "type": "checkbox", "label": "Parked"},
+        "level": { "type": "radio", "label": "Climb Level", "options": { "low": "low", "medium": "medium", "high": "high"}},
+        "Notes": { "type": "text", "label": "Notes" }
+    },
+    "2025": {
+        
+    }
+}

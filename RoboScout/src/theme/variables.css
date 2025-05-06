@@ -1,0 +1,10 @@
+/* For information on how to create your own theme, please see:
+http://ionicframework.com/docs/theming/ */
+
+:root {
+    --red: #c41616;
+    --white: #ffffff;
+    --black: #000000;
+    --gray: #54565a;
+    --alt-red: #a82a3b;
+}

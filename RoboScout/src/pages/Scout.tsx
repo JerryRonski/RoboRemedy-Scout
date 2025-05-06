@@ -139,7 +139,7 @@ const ScoutPage = () => {
                             </IonCol>
                         </IonRow>
 
-                        {Object.entries(test_config.customFields).map(([fieldName, fieldType]) => { 
+                        {Object.entries(test_config.test).map(([fieldName, fieldType]) => { 
                             if (fieldType.type === 'text' || fieldType.type === 'number') { // render text or number input 
                                 return (
                                     <IonItem key={fieldName}>

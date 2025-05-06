@@ -1,6 +1,6 @@
 import test_config from '../assets/test_config.json'
 
-const fields = test_config.customFields;
+const fields = test_config.test;
 
 export interface DynamicEntry {
     matchId: number;

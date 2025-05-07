@@ -3,7 +3,7 @@ import { IonContent, IonPage, IonHeader, IonToolbar, IonButtons, IonMenuButton, 
 import storage from "../storage";
 import QRCode from 'qrcode';
 import MatchEntry, { DynamicEntry } from "../assets/MatchEntry";
-import test_config from '../assets/test_config.json';
+import test_config from '../assets/config.json';
 
 
 const ScoutPage = () => {

@@ -23,7 +23,7 @@ const HomePage = () => {
                     </div>
                     
                     <div className="row mt-5">
-                        <div className="col-12 text-center">
+                        <div className="col-12 ion-text-center">
                             <h1>Robo Scout</h1>
                             <h6>1.0.26v</h6>
                         </div>

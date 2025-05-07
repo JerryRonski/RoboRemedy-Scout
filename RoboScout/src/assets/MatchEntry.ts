@@ -1,4 +1,4 @@
-import test_config from '../assets/test_config.json'
+import test_config from '../assets/config.json'
 
 const fields = test_config.test;
 

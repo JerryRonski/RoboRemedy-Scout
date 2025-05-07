@@ -55,7 +55,7 @@ const App: React.FC = () => {
                     <Route path="/Home" component={HomePage} exact />
                     <Route path="/Scout" component={ScoutPage} exact />
                     <Route path="/History" component={HistoryPage} exact />
-                    <Route path="/History/:id" component={MatchDetailsPage} />
+                    <Route path="/History/:id/:team" component={MatchDetailsPage} />
                     <Route path="/Settings" component={SettingsPage} exact />
                 </IonRouterOutlet>
                 </IonSplitPane>

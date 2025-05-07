@@ -1,14 +1,20 @@
+import { DynamicEntry } from "./MatchEntry";
 
+let configJSON: Record<string, DynamicEntry>;
 
-const response = await fetch('https://github.com/JerryRonski/RoboRemedy-Scout/blob/main/RoboScout/src/assets/test_config.json');
-const configJSON = await response.json();
-
-const versions = Object.keys(configJSON);
-
-export function getConfigList() {
-    return versions;
+export function loadConfig(): Promise<void> {
+  return fetch("https://raw.githubusercontent.com/JerryRonski/RoboRemedy-Scout/main/RoboScout/src/assets/config.json")
+    .then(res => res.json())
+    .then(data => {
+      configJSON = data;
+      console.log("Config loaded:", data);
+    });
 }
 
-export default function getConfig(name: string) {
-    return configJSON[name];
+export function getConfigList(): string[] {
+  return Object.keys(configJSON);
+}
+
+export default function getConfig(version: string) {
+  return configJSON[version];
 }

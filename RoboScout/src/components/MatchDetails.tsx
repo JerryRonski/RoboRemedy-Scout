@@ -7,6 +7,7 @@ import { arrowBack } from "ionicons/icons";
 
 interface RouteParams {
   id: string;
+  team: string
 }
 
 interface MatchEntry {
@@ -19,12 +20,13 @@ const MatchDetailsPage = () => {
     const [entry, setEntry] = useState<MatchEntry>();
     const [qrCodeURL, setQrCodeUrl] = useState<string | null>(null);
     const [showQr, setShowQr] = useState(false);
-    const { id } = useParams<RouteParams>();
+    const { id, team } = useParams<RouteParams>();
+    console.log("Id: " + id + " | #: " + team);
     
     useIonViewWillEnter(() => {
         (async () => {
             const data = await storage.get('entries');
-            const match = data.find((d: MatchEntry) => d.matchId === id);
+            const match = data.find((d: MatchEntry) => d.matchId == id && d.teamNumber == team);
             setEntry(match);
         })();
     });

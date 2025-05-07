@@ -19,8 +19,8 @@ const HistoryPage = () => {
         })();
     });
     
-    const handleOnClick = (id: string) => {
-        history.push(`/History/${id}`);
+    const handleOnClick = (id: string, team: string) => {
+        history.push(`/History/${id}/${team}`);
     };
 
     return (
@@ -37,7 +37,7 @@ const HistoryPage = () => {
             <IonContent>
                 <IonList>
                     {entries.map((entry: MatchEntry, index: number) => (
-                        <IonItem button key={index} onClick={() => handleOnClick(entry.matchId)}>
+                        <IonItem button key={index} onClick={() => handleOnClick(entry.matchId, entry.teamNumber)}>
                             <IonLabel>Match {entry.matchId} - Team {entry.teamNumber}</IonLabel>
                         </IonItem>
                     ))}

@@ -1,42 +1,43 @@
 import React, { useState } from "react";
 import { IonButtons, IonContent, IonHeader, IonItem, IonLabel, IonList, IonMenuButton, IonPage, IonTitle, IonToolbar, useIonViewWillEnter, } from "@ionic/react";
-import storage from "../storage";
+import { DataService } from "../services/DataService";
 import { useHistory } from "react-router";
-
-interface MatchEntry {
-    matchId: string;
-    teamNumber: string;
-}
+import './Pages.css';
+import { DynamicEntry } from "../assets/MatchEntry";
 
 const HistoryPage = () => {
-    const [entries, setEntries] = useState<MatchEntry[]>([]);
+    const [entries, setEntries] = useState<DynamicEntry[]>([]);
     const history = useHistory();
+
+    const dataService = new DataService();
+    dataService.ready();
 
     useIonViewWillEnter(() => {
         (async () => {
-            const data = await storage.get('entries');
-            setEntries(data || []);
+            setEntries(await dataService.get('entries') || []);
         })();
     });
     
-    const handleOnClick = (id: string, team: string) => {
+    const handleOnClick = (id: number, team: number) => {
         history.push(`/History/${id}/${team}`);
     };
 
     return (
         <IonPage>
             <IonHeader>
-                <IonToolbar>
-                    <IonButtons slot="start">
-                        <IonMenuButton />
-                    </IonButtons>
-                    <IonTitle>History</IonTitle>
+                <IonToolbar className="toolbar-spaced">
+                    <div className="toolbar-content">
+                        <IonButtons slot="start">
+                            <IonMenuButton />
+                        </IonButtons>
+                        <IonTitle>History</IonTitle>
+                    </div>
                 </IonToolbar>
             </IonHeader>
 
             <IonContent>
                 <IonList>
-                    {entries.map((entry: MatchEntry, index: number) => (
+                    {entries.map((entry: DynamicEntry, index: number) => (
                         <IonItem button key={index} onClick={() => handleOnClick(entry.matchId, entry.teamNumber)}>
                             <IonLabel>Match {entry.matchId} - Team {entry.teamNumber}</IonLabel>
                         </IonItem>

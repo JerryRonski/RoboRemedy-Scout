@@ -1,19 +1,36 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { IonContent, IonPage, IonHeader, IonToolbar, IonButtons, IonMenuButton, IonTitle, IonGrid, IonList, IonItem, IonInput, IonButton, IonRange, IonCheckbox, IonRadioGroup, IonRadio, IonModal, useIonAlert, IonRow, IonCol, IonText, useIonToast } from "@ionic/react";
-import storage from "../storage";
+import { DataService } from "../services/DataService";
 import QRCode from 'qrcode';
-import MatchEntry, { DynamicEntry } from "../assets/MatchEntry";
-import test_config from '../assets/config.json';
+import { createMatchEntry, DynamicEntry } from "../assets/MatchEntry";
+import './Pages.css';
+
+
 
 
 const ScoutPage = () => {
-    const [formData, setFormData] = useState(MatchEntry);
-    const [showQr, setShowQr] = useState(false);
-    const [qrCodeURL, setQrCodeUrl] = useState<string | null>(null);
-    const [toast] = useIonToast();
+    const [formData, setFormData] = useState<DynamicEntry | null>(null);  // where form data is saved
+    const [showQr, setShowQr] = useState(false); // boolean for whether to show qr code
+    const [qrCodeURL, setQrCodeUrl] = useState<string | null>(null); // qr string variable
+    const [toast] = useIonToast(); // add/update/error pop-up notification 
+    const [confirmClear] = useIonAlert(); // clear confirm pop-up
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const [config, setConfig] = useState<Record<string, any> | null>(null);
 
-    const [confirmClear] = useIonAlert();
+    const dataService = new DataService(); // service/class that handles all data storage
+    
+    useEffect(() => { // handles the async
+        const load = async () => {
+            await dataService.ready();
+            setConfig(await dataService.get('currVers'));
 
+            const entry = await createMatchEntry();
+            setFormData(entry);
+        };
+        load();
+    }, []);
+
+    // updates form with onIonInput(updates while typing) and onIonChange(updates on unfocus)
     const handleChange = (e: CustomEvent, field: string, type: 'text' | 'number' | 'checkbox' = 'text') => {
         let value: string | number | boolean;
         
@@ -27,52 +44,75 @@ const ScoutPage = () => {
         }
 
         setFormData(prev => ({
-            ...prev,
+            ...(prev as DynamicEntry),
             [field]: value,
         }));
     };
 
     const handleSave = async () => {
-        console.log("Save Clicked");
-        const entries = await storage.get('entries') || [];
+        // console.log('save clicked');
 
-        const index = entries.findIndex((m: DynamicEntry) => m.matchId === Number(formData['matchId']) && m.teamNumber === Number(formData['teamNumber'])); // find existing entry
-        console.log("Index: " + index)
+        // leaves time for handleChange to run
+        await new Promise(res => setTimeout(res, 500));
 
-        if (index !== -1) {
-            entries[index] = formData; // replace existing
+        let saveResult = ''
+
+        if (formData) {
+            saveResult = await dataService.addEntry(formData);
+        } else {
+            saveResult = 'null';
+        }
+        
+
+        if (saveResult === 'add') {
             toast({
-                message: 'Entry updated',
+                message: "Entry Added",
                 duration: 1500,
+                position: 'bottom',
+                color: 'success',
+            });
+        } else if (saveResult === 'update') {
+            toast({
+                message: "Entry Added",
+                duration: 1500,
+                position: 'bottom',
                 color: 'warning',
             });
-        } else {
-            entries.push(formData); // add new
+        } else if (saveResult === 'null') { 
             toast({
-                message: 'Entry saved',
+                message: "Entry can not be null",
                 duration: 1500,
-                color: 'success',
+                position: 'bottom',
+                color: 'danger',
+            });
+        }else {
+            toast({
+                message: "Failed to Save Entry",
+                duration: 1500,
+                position: 'bottom',
+                color: 'danger',
             });
         }
 
-        await storage.set('entries', entries);
-        console.log( await storage.get('entries') );
+        //console.log( await dataService.get('entries') );
     };
 
+    // generates qr code and shows qr code
     const handleGenerate = async () => {
-        console.log("Gen Clicked");
+        // console.log("Gen Clicked");
         try {
             const dataString = JSON.stringify(formData);
             const url = await QRCode.toDataURL(dataString);
             setQrCodeUrl(url);
             setShowQr(true);
-            console.log("QR Code Generated");
+            //console.log("QR Code Generated");
         }
         catch (err) {
             console.error(err);
         }
     };
 
+    // resets the formData
     const resetData = (entry: DynamicEntry) => {
         const cleared: DynamicEntry = {matchId: 0, teamNumber: 0};
 
@@ -91,6 +131,7 @@ const ScoutPage = () => {
         setFormData(cleared);
     };
 
+    // Clear confirm pop-up
     const handleClear = () => {
         confirmClear({
             header: 'Clear Form?',
@@ -104,21 +145,38 @@ const ScoutPage = () => {
                     text: 'Clear',
                     role: 'destructive',
                     handler: () => {
-                        resetData(formData);
+                        if (formData) resetData(formData);
                     },
                 },
             ],
         });
     };
 
+    if (!formData || !config) {
+        return (
+            <IonPage>
+                <IonHeader>
+                    <IonToolbar>
+                        <IonTitle>Loading...</IonTitle>
+                    </IonToolbar>
+                </IonHeader>
+                <IonContent className="ion-padding">
+                    <IonText>Loading form data...</IonText>
+                </IonContent>
+            </IonPage>
+        );
+    }
+
     return (
         <IonPage>
             <IonHeader>
-                <IonToolbar>
-                    <IonButtons slot="start">
-                    <IonMenuButton />
-                    </IonButtons>
-                    <IonTitle>Scout Form</IonTitle>
+                <IonToolbar className="toolbar-spaced">
+                    <div className="toolbar-content">
+                        <IonButtons slot="start">
+                            <IonMenuButton />
+                        </IonButtons>
+                        <IonTitle>Scout Form</IonTitle>
+                    </div>
                 </IonToolbar>
             </IonHeader>
 
@@ -126,21 +184,27 @@ const ScoutPage = () => {
                 <IonGrid>
                     <IonList>
                         <IonRow>
+                            {/* Generate the default Match Number and Team Number fields */}
                             <IonCol size="6">
                                 <IonItem>
-                                    <IonInput type="number" min={1} max={99} label="Match Number" labelPlacement="floating" placeholder="" value={formData.matchId} onIonChange={(e) => handleChange(e, "matchId", "number")} />
+                                    <IonInput type="number" min={1} max={99} label="Match Number" labelPlacement="floating" placeholder="" value={formData.matchId} onIonInput={(e) => handleChange(e, "matchId", "number")} />
                                 </IonItem>
                             </IonCol>
 
                             <IonCol size="6">
                                 <IonItem>
-                                    <IonInput type="number" min={1} max={9999} label="Team Number" labelPlacement="floating" placeholder="" value={formData.teamNumber} onIonChange={(e) => handleChange(e, "teamNumber", "number")} />
+                                    <IonInput type="number" min={1} max={9999} label="Team Number" labelPlacement="floating" placeholder="" value={formData.teamNumber} onIonInput={(e) => handleChange(e, "teamNumber", "number")} />
                                 </IonItem>
                             </IonCol>
                         </IonRow>
 
-                        {Object.entries(test_config.test).map(([fieldName, fieldType]) => { 
+                        {/* Dynamically Generate Fields from .JSON file */}
+                        {config && Object.entries(config).map(([fieldName, fieldType]) => { 
                             if (fieldType.type === 'text' || fieldType.type === 'number') { // render text or number input 
+                                /*
+                                    use onIonInput for IonInput and IonTextarea, and onIonChange for everything else
+                                    this is to make sure that they update properly so that it is saved properly
+                                */
                                 return (
                                     <IonItem key={fieldName}>
                                         <IonInput
@@ -149,7 +213,7 @@ const ScoutPage = () => {
                                             labelPlacement="floating"
                                             placeholder=""
                                             value={String(formData[fieldName])}
-                                            onIonChange={(e) => handleChange(e, fieldName, (fieldType.type === 'number' ? 'number' : 'text'))}
+                                            onIonInput={(e) => handleChange(e, fieldName, (fieldType.type === 'number' ? 'number' : 'text'))}
                                         />
                                     </IonItem>
                                 );
@@ -215,7 +279,8 @@ const ScoutPage = () => {
 
                     </IonList>
                 </IonGrid>
-
+                
+                {/* Hidden Qr Code element */}
                 <IonModal isOpen={showQr} onDidDismiss={() => setShowQr(false)}>
                     <IonContent className="ion-padding ion-text-center">
                         <h2>QR Code</h2>

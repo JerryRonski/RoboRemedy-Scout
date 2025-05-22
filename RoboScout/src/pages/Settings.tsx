@@ -1,40 +1,45 @@
 import { IonContent, IonPage, IonHeader, IonToolbar, IonButtons, IonMenuButton, IonTitle, IonButton, IonSelect, IonSelectOption } from "@ionic/react";
-import storage from "../storage";
-import getConfig, { getConfigList, loadConfig } from "../assets/config";
+import { DataService } from "../services/DataService";
+import { ConfigService } from "../services/ConfigService";
 import { useEffect, useState } from "react";
 
 
 const SettingsPage = () => {
     const [versions, setVersions] = useState<string[]>([]);
 
+    const dataService = new DataService();
+    const configService = new ConfigService();
+
     useEffect(() => {
         const load = async () => {
-            await loadConfig(); // Waits for fetch to finish
-            const vers = getConfigList();
-            setVersions(vers); // Set local state or use vers as needed
+            await dataService.ready();
+            await configService.ready();
+            setVersions(configService.getList());
+            console.log(versions);
         };
-
         load();
     }, []);
 
     const handleClear = async () => {
-        storage.set('entries', []);
-        console.log( await storage.get('entries'));
+        await dataService.set('entries', []);
+        console.log( await dataService.get('entries'));
     }
 
     const handleVersion = async (e: CustomEvent) => {
-        await storage.set('version', getConfig(e.detail.value));
-        console.log(await storage.get('version'));
+        await dataService.set('currVers', configService.get(e.detail.value));
+        console.log(await dataService.get('version'));
     }
 
     return (
         <IonPage>
             <IonHeader>
-                <IonToolbar>
-                    <IonButtons slot="start">
-                    <IonMenuButton />
-                    </IonButtons>
-                    <IonTitle>Settings</IonTitle>
+                <IonToolbar className="toolbar-spaced">
+                    <div className="toolbar-content">
+                        <IonButtons slot="start">
+                            <IonMenuButton />
+                        </IonButtons>
+                        <IonTitle>Settings</IonTitle>
+                    </div>
                 </IonToolbar>
             </IonHeader>
 

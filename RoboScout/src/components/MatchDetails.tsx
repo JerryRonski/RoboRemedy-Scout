@@ -1,34 +1,31 @@
 import React, { useState } from "react";
 import { IonButton, IonButtons, IonCol, IonContent, IonHeader, IonIcon, IonItem, IonList, IonModal, IonPage, IonRow, IonTitle, IonToolbar, useIonViewWillEnter } from "@ionic/react";
-import storage from "../storage";
+import { DataService } from "../services/DataService";
 import { useParams } from "react-router-dom";
 import QRCode from "qrcode";
 import { arrowBack } from "ionicons/icons";
+import { DynamicEntry } from "../assets/MatchEntry";
 
 interface RouteParams {
   id: string;
   team: string
 }
 
-interface MatchEntry {
-    matchId: string;
-    teamNumber: string;
-    [key: string]: string | number | boolean;
-}
-
 const MatchDetailsPage = () => {
-    const [entry, setEntry] = useState<MatchEntry>();
+    const [entry, setEntry] = useState<DynamicEntry>();
     const [qrCodeURL, setQrCodeUrl] = useState<string | null>(null);
     const [showQr, setShowQr] = useState(false);
     const { id, team } = useParams<RouteParams>();
     console.log("Id: " + id + " | #: " + team);
-    
+
+    const dataService = new DataService();
+    dataService.ready();
+
     useIonViewWillEnter(() => {
-        (async () => {
-            const data = await storage.get('entries');
-            const match = data.find((d: MatchEntry) => d.matchId == id && d.teamNumber == team);
-            setEntry(match);
-        })();
+        const load = async () => {
+            setEntry(await dataService.getEntry(Number(id), Number(team)));
+        }
+        load(); 
     });
 
     const handleGenerate = async () => {

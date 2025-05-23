@@ -1,0 +1,61 @@
+{
+    "2025": {
+        "auto" : { 
+            "bool" : { 
+                "id" : "hasAuto", 
+                "title":"Can you perform Auto?", 
+                "type" : "switch",
+                 "opt" : ["Yes", "No"]
+            },
+            "text" : { 
+                "id" : "autoPos", 
+                "title" : "Auto Starting Postion", 
+                "type" : "text" 
+            },
+            "number" : { 
+                "id" : "autoCount", 
+                "title" : "How many coral/algae can you score in Auto?", 
+                "type" : "number" 
+            },
+            "textarea" : { 
+                "id" : "autoNotes", 
+                "title" : "Additional Notes on Auto", 
+                "type" : "textarea" 
+            }
+        },
+
+        "teleop" : {
+            "switch" : { 
+                "id" : "gamePiece", 
+                "title" : "What can you score coral, algae, or both?", 
+                "type" : "switch", 
+                "opt" : ["coral", "algae", "both"] 
+            },
+            "check" : { 
+                "id" : "levels", 
+                "title" : "What levels can you score", 
+                "type" : "check", 
+                "opt" : ["None", "Level 1", "Level 2", "Level 3", "Level 4"] 
+            },
+            "number" : { 
+                "id" : "teleopCount", 
+                "title": "How many game pieces can you score in teleop?", 
+                "type" : "number" 
+            }
+        },
+
+        "endgame" : {
+            "bool" : { 
+                "id" : "canClimb", 
+                "title" : "Can Climb?", 
+                "type" : "bool" 
+            },
+            "switch" : { 
+                "id" : "climbHeight", 
+                "title" : "Preferred height", 
+                "type" : "switch", 
+                "opt" : ["deep", "shallow"] 
+            }
+        }
+    }
+}

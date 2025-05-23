@@ -1,2 +1,17 @@
 /* For information on how to create your own theme, please see:
 http://ionicframework.com/docs/theming/ */
+
+:root {
+    --ion-content: #121212;
+    --ion-list: #1E1E1E;
+
+    /* Primary */
+    --red: #C8102E;
+    --red-bg: #C8102E50;
+    --white: #F9F9F9;
+    --dark: #1C1C1C;
+
+    /* Secondary */
+    --gray: #A8A9AD;
+    --black: #000000;
+}

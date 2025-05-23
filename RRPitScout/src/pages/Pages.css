@@ -1,0 +1,37 @@
+.toolbar-spaced {
+    --min-height: 80px;
+    /* optional: make toolbar taller */
+}
+
+.toolbar-content {
+    display: flex;
+    align-items: center;
+    padding: 16px 0 10px;
+    width: 100%;
+}
+
+.dr-jerry-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 70vh;
+    overflow: hidden;
+}
+
+.dr-jerry-img {
+    max-height: 100%;
+    width: auto;
+    object-fit: contain;
+}
+
+ion-content {
+    background-color: var(--ion-content);
+}
+
+ion-list {
+    background-color: var(--ion-list);
+}
+
+ion-item-divider {
+    background-color: var(--red);
+}
